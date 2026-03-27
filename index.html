@@ -1,658 +1,713 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Customer Portal</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+  <title>Customer Portal – Friends of Fairview</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+    body { background: #f3f4f6; }
+
+    /* NAV */
+    .topnav { background: linear-gradient(to right, #1e3a8a, #3730a3); color: #fff; padding: 0.75rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .topnav .brand { font-weight: 700; font-size: 0.875rem; }
+    .topnav .links { display: flex; gap: 1.25rem; font-size: 0.875rem; opacity: 0.85; }
+    .topnav .links a { color: #fff; text-decoration: none; }
+    .topnav .links a:hover { opacity: 1; text-decoration: underline; }
+
+    /* BANNER */
+    .banner { height: 5rem; background: linear-gradient(to right, #1e40af, #3730a3); display: flex; align-items: center; padding: 0 1.5rem; }
+    .banner p { color: rgba(255,255,255,0.7); font-style: italic; font-size: 0.875rem; }
+
+    /* ACCOUNT HEADER */
+    .acct-header { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .acct-header .user { display: flex; align-items: center; gap: 0.75rem; }
+    .avatar { width: 2.5rem; height: 2.5rem; background: linear-gradient(135deg,#2563eb,#4338ca); color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; flex-shrink: 0; }
+    .acct-header .name { font-weight: 700; color: #1f2937; }
+    .acct-header .since { font-size: 0.75rem; color: #9ca3af; }
+    .cart-btn { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #1d4ed8; font-weight: 600; border: 1px solid #bfdbfe; padding: 0.5rem 1rem; cursor: pointer; background: #fff; text-decoration: none; }
+    .cart-badge { background: #2563eb; color: #fff; font-size: 0.7rem; width: 1.25rem; height: 1.25rem; display: flex; align-items: center; justify-content: center; }
+
+    /* TABS */
+    .tabs { background: #fff; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .tabs ul { max-width: 64rem; margin: 0 auto; display: flex; list-style: none; overflow-x: auto; }
+    .tabs ul li a { display: flex; align-items: center; gap: 0.375rem; padding: 0.875rem 1.25rem; font-size: 0.875rem; font-weight: 500; color: #6b7280; text-decoration: none; border-bottom: 2px solid transparent; white-space: nowrap; }
+    .tabs ul li a.active { color: #1d4ed8; border-bottom: 2px solid #2563eb; }
+    .tabs ul li a:hover { color: #374151; }
+    .tab-badge { background: #2563eb; color: #fff; font-size: 0.7rem; width: 1rem; height: 1rem; display: flex; align-items: center; justify-content: center; }
+
+    /* CONTENT */
+    .content { max-width: 64rem; margin: 0 auto; padding: 1.5rem 1rem; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* CARDS */
+    .card { background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 1rem; }
+    .card-header { padding: 1rem 1.25rem; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; }
+    .card-header h2 { font-weight: 700; color: #1f2937; font-size: 1rem; }
+    .card-body { padding: 1.25rem; }
+
+    /* GRID */
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem; }
+    .stat-card { background: #fff; border: 1px solid #e5e7eb; padding: 1rem; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .stat-card .icon { font-size: 1.5rem; margin-bottom: 0.25rem; }
+    .stat-card .value { font-size: 1.5rem; font-weight: 700; }
+    .stat-card .label { font-size: 0.75rem; color: #6b7280; margin-top: 0.125rem; }
+
+    /* SUBSCRIPTION ROWS */
+    .sub-row { border: 1px solid #e5e7eb; margin-bottom: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .sub-row-header { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: #fff; cursor: pointer; }
+    .sub-row-header:hover { background: #f9fafb; }
+    .sub-row-header img { width: 2.75rem; height: 2.75rem; object-fit: cover; flex-shrink: 0; }
+    .sub-row-header .info { flex: 1; min-width: 0; }
+    .sub-row-header .info .title-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .sub-row-header .info .sub-name { font-weight: 700; color: #1f2937; }
+    .sub-row-header .info .sub-loc { font-size: 0.75rem; color: #6b7280; margin-top: 0.2rem; }
+    .sub-row-header .price-col { text-align: right; flex-shrink: 0; }
+    .sub-row-header .price-col .price { font-weight: 700; color: #1f2937; }
+    .sub-row-header .price-col .flags { font-size: 0.75rem; color: #9ca3af; }
+    .sub-row-header .hero-col { text-align: center; flex-shrink: 0; min-width: 3.5rem; }
+    .sub-row-header .hero-col .hcount { font-size: 0.875rem; font-weight: 700; color: #2563eb; }
+    .sub-row-header .hero-col .hlabel { font-size: 0.7rem; color: #9ca3af; }
+    .arrow { font-size: 0.75rem; color: #9ca3af; transition: transform 0.2s; display: inline-block; margin-left: 0.5rem; }
+    .sub-row.open .arrow { transform: rotate(180deg); }
+    .sub-warning { background: #fffbeb; border-top: 1px solid #fef3c7; padding: 0.5rem 1.25rem; font-size: 0.75rem; color: #b45309; font-weight: 500; }
+    .sub-heroes { display: none; border-top: 1px solid #f3f4f6; background: #f9fafb; padding: 1.25rem; }
+    .sub-row.open .sub-heroes { display: block; }
+    .progress-bar { background: #e5e7eb; height: 0.5rem; margin-bottom: 1.25rem; }
+    .progress-fill { background: #2563eb; height: 0.5rem; }
+    .hero-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.75rem; }
+    .hero-card { border: 1px solid #e5e7eb; padding: 0.875rem; background: #fff; }
+    .hero-card.empty { border: 1px dashed #d1d5db; background: #f9fafb; text-align: center; padding: 1.25rem 0.875rem; color: #9ca3af; font-size: 0.75rem; }
+    .hero-card.empty .plus { width: 2.5rem; height: 2.5rem; border: 2px dashed #d1d5db; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; margin: 0 auto 0.5rem; }
+    .hero-avatar { width: 2.25rem; height: 2.25rem; background: linear-gradient(135deg,#2563eb,#4338ca); color: #fff; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .hero-name { font-weight: 600; font-size: 0.875rem; color: #1f2937; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hero-flag { font-size: 0.7rem; color: #9ca3af; }
+    .hero-branch { font-size: 0.7rem; background: #dbeafe; color: #1e40af; padding: 0.1rem 0.5rem; display: inline-block; margin: 0.25rem 0; }
+    .hero-story { font-size: 0.75rem; color: #6b7280; }
+    .hero-edit-btn { font-size: 0.75rem; color: #3b82f6; background: none; border: none; cursor: pointer; padding: 0; float: right; }
+
+    /* BADGES */
+    .badge-paid { background: #d1fae5; color: #065f46; font-size: 0.7rem; font-weight: 600; padding: 0.15rem 0.5rem; }
+    .badge-pending { background: #fef3c7; color: #92400e; font-size: 0.7rem; font-weight: 600; padding: 0.15rem 0.5rem; }
+
+    /* ACCOUNT INFO */
+    .info-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; }
+    .info-box { border: 1px solid #e5e7eb; padding: 1rem; }
+    .info-box h3 { font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.75rem; display: flex; justify-content: space-between; }
+    .info-box h3 a { font-size: 0.75rem; color: #3b82f6; text-decoration: none; font-weight: 500; }
+    .info-box p { font-size: 0.875rem; color: #4b5563; line-height: 1.7; }
+    .danger-box { background: #fff; border: 1px solid #fee2e2; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
+    .danger-box .text h4 { font-weight: 600; color: #b91c1c; font-size: 0.875rem; }
+    .danger-box .text p { font-size: 0.75rem; color: #6b7280; margin-top: 0.125rem; }
+    .btn-danger { background: #dc2626; color: #fff; border: none; padding: 0.5rem 1rem; font-size: 0.875rem; cursor: pointer; font-weight: 500; }
+
+    /* CART */
+    .cart-layout { display: flex; gap: 1.25rem; align-items: flex-start; flex-wrap: wrap; }
+    .cart-left { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1rem; }
+    .cart-right { width: 18rem; flex-shrink: 0; display: flex; flex-direction: column; gap: 1rem; }
+    .cart-item { display: flex; gap: 1rem; }
+    .cart-item img { width: 5rem; height: 4rem; object-fit: cover; flex-shrink: 0; }
+    .cart-item .details { flex: 1; }
+    .cart-item .item-title { font-weight: 700; color: #1d4ed8; font-size: 0.875rem; }
+    .cart-item .item-sub { font-size: 0.75rem; color: #6b7280; }
+    .cart-item .item-price { font-weight: 700; color: #1f2937; white-space: nowrap; }
+    .sub-year-rows { padding-left: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.75rem; }
+    .sub-year-row { display: flex; align-items: center; gap: 0.75rem; border: 1px solid #e5e7eb; padding: 0.75rem 1rem; background: #f9fafb; }
+    .sub-year-row .year-label { flex: 1; font-size: 0.875rem; font-weight: 500; color: #374151; }
+    .flag-count { display: flex; align-items: center; gap: 0.375rem; font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem; }
+    .flag-count button { width: 1.25rem; height: 1.25rem; border: 1px solid #d1d5db; background: #fff; cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; }
+    .flag-count span { font-weight: 600; font-size: 0.875rem; min-width: 1rem; text-align: center; }
+    .year-opts { padding-left: 1.5rem; margin-top: 1rem; }
+    .year-opts p { font-size: 0.875rem; color: #4b5563; margin-bottom: 0.5rem; }
+    .year-radios { display: flex; flex-wrap: wrap; gap: 0.375rem 1rem; }
+    .year-radios label { font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem; cursor: pointer; }
+    .autopay-row { display: flex; align-items: center; justify-content: space-between; margin-top: 0.75rem; font-size: 0.875rem; color: #4b5563; }
+    .autopay-row a { font-size: 0.75rem; color: #3b82f6; }
+    .first-delivery { display: flex; justify-content: space-between; padding-top: 0.75rem; margin-top: 0.75rem; border-top: 1px solid #f3f4f6; padding-left: 1.5rem; font-size: 0.875rem; }
+    .first-delivery span:last-child { font-weight: 600; color: #1f2937; }
+
+    /* PRODUCT TILES */
+    .product-tiles { display: grid; grid-template-columns: repeat(3,1fr); }
+    .product-tile { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 1rem; border-left: 1px solid #f3f4f6; cursor: pointer; }
+    .product-tile:first-child { border-left: none; }
+    .product-tile:hover { background: #eff6ff; }
+    .product-tile img { width: 100%; aspect-ratio: 1/1; object-fit: cover; margin-bottom: 0.75rem; }
+    .product-tile h4 { font-weight: 600; font-size: 0.875rem; color: #1f2937; margin-bottom: 0.25rem; }
+    .product-tile p { font-size: 0.7rem; color: #6b7280; line-height: 1.4; margin-bottom: 0.75rem; flex: 1; }
+    .btn-addcart { width: 100%; background: #1d4ed8; color: #fff; border: none; padding: 0.5rem; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
+    .btn-addcart:hover { background: #1e40af; }
+
+    /* DONATION */
+    .donation-section { display: flex; flex-direction: column; gap: 0.75rem; }
+    .donation-product { display: flex; gap: 1rem; }
+    .donation-product img { width: 4rem; height: 4rem; object-fit: cover; flex-shrink: 0; }
+    .donation-opts { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .donation-opts label { display: flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; font-size: 0.875rem; cursor: pointer; background: #fff; }
+    .donation-opts input[type=radio]:checked + span { font-weight: 600; }
+    .donation-opts label:has(input:checked) { background: #2563eb; color: #fff; border-color: #2563eb; }
+
+    /* SUMMARY */
+    .summary-box { border: 1px solid #bfdbfe; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .summary-header { background: #1d4ed8; padding: 0.75rem 1.25rem; color: #fff; font-weight: 700; font-size: 0.875rem; }
+    .summary-body { background: #eff6ff; padding: 1rem 1.25rem; }
+    .summary-row { display: flex; justify-content: space-between; font-size: 0.875rem; color: #374151; padding: 0.2rem 0; }
+    .summary-row.discount { color: #dc2626; }
+    .summary-row.total { font-weight: 700; color: #1d4ed8; font-size: 1rem; border-top: 1px solid #bfdbfe; padding-top: 0.5rem; margin-top: 0.25rem; }
+    .summary-row.subtotal { font-weight: 600; color: #1f2937; }
+    .summary-divider { border: none; border-top: 1px solid #bfdbfe; margin: 0.5rem 0; }
+
+    /* PAYMENT FORM */
+    .payment-box { background: #fff; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .payment-header { background: #1d4ed8; padding: 0.75rem 1.25rem; color: #fff; font-weight: 700; font-size: 0.875rem; }
+    .payment-body { padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.25rem; }
+    .form-group label { font-size: 0.75rem; color: #6b7280; font-weight: 500; }
+    .form-group input, .form-group select { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; font-size: 0.875rem; width: 100%; }
+    .form-row { display: flex; gap: 0.5rem; }
+    .form-row .form-group { flex: 1; }
+    .radio-row { display: flex; gap: 1rem; font-size: 0.875rem; }
+    .radio-row label { display: flex; align-items: center; gap: 0.375rem; cursor: pointer; }
+    .sms-row { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.75rem; color: #4b5563; }
+    .sms-row input { margin-top: 0.125rem; flex-shrink: 0; }
+    .order-warning { font-size: 0.75rem; color: #dc2626; text-align: center; font-weight: 500; }
+    .btn-order { width: 100%; background: #16a34a; color: #fff; border: none; padding: 0.75rem; font-weight: 700; font-size: 0.875rem; cursor: pointer; }
+    .btn-order:hover { background: #15803d; }
+
+    /* PAYMENT HISTORY */
+    .history-table { width: 100%; border-collapse: collapse; }
+    .history-table th { padding: 0.75rem 1.5rem; text-align: left; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; background: #f9fafb; }
+    .history-table td { padding: 1rem 1.5rem; border-top: 1px solid #f3f4f6; font-size: 0.875rem; color: #374151; }
+    .history-table tr:hover td { background: #f9fafb; }
+    .type-badge { font-size: 0.7rem; font-weight: 600; background: #dbeafe; color: #1d4ed8; padding: 0.125rem 0.5rem; }
+    .table-footer { display: flex; justify-content: flex-end; padding: 1rem 1.5rem; border-top: 1px solid #f3f4f6; background: #f9fafb; }
+    .table-footer .total-label { font-size: 0.75rem; color: #6b7280; text-transform: uppercase; font-weight: 600; }
+    .table-footer .total-val { font-size: 1.125rem; font-weight: 700; color: #1f2937; }
+    .btn-flag-mgr { font-size: 0.875rem; font-weight: 500; color: #fff; background: #1d4ed8; padding: 0.5rem 1rem; border: none; cursor: pointer; }
+    .btn-flag-mgr:hover { background: #1e40af; }
+    .add-location-btn { font-size: 0.875rem; border: 1px solid #d1d5db; padding: 0.375rem 0.75rem; cursor: pointer; background: #fff; }
+    .dashed-btn { width: 100%; padding: 0.75rem; border: 2px dashed #93c5fd; color: #2563eb; font-size: 0.875rem; font-weight: 500; cursor: pointer; background: #fff; margin-top: 0.5rem; }
+    .dashed-btn:hover { background: #eff6ff; }
+    .heroes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+    .heroes-header span { font-weight: 600; font-size: 0.875rem; color: #374151; }
+    .heroes-header small { font-size: 0.75rem; color: #9ca3af; }
+  </style>
 </head>
-<body class="bg-gray-100">
-  <div id="root"></div>
-  <script type="text/babel">
-    const { useState } = React;
+<body>
 
-    const BRANCHES = ["Army", "Navy", "Air Force", "Marines", "Coast Guard", "Space Force"];
+  <!-- TOP NAV -->
+  <div class="topnav">
+    <span class="brand">🏠 Friends of Fairview</span>
+    <div class="links">
+      <a href="#">🌐 Club Website</a>
+      <a href="#">❓ Help</a>
+      <a href="#">↪️ Sign Out</a>
+    </div>
+  </div>
 
-    const subImages = {
-      "Field of Heroes": "https://i.ibb.co/39KHyB1c/FHlogo.png",
-      "Military Flags": "https://i.ibb.co/sJRfyKZx/Donation-Image.jpg",
-      "Home Flags": "https://i.ibb.co/3mpmJVZP/USA-Flag.jpg",
-    };
+  <!-- BANNER -->
+  <div class="banner">
+    <p>Honoring those who served 🇺🇸</p>
+  </div>
 
-    const initialSubscriptions = [
-      {
-        id: 1, name: "Field of Heroes", location: "3434 Hwy 6", flags: 10, price: 50.00,
-        status: "pending", validThru: "11-11-2026", subscriptionDate: "11-12-2025 / 11-11-2026",
-        heroesEnabled: true,
-        heroes: [
-          { id: 1, name: "Sgt. James Walker", branch: "Army", story: "Served two tours in Afghanistan.", photo: null },
-          { id: 2, name: "Lt. Maria Chen", branch: "Navy", story: "Decorated naval officer.", photo: null },
-          ...Array.from({ length: 8 }, (_, i) => ({ id: i + 3, name: "", branch: "", story: "", photo: null }))
-        ]
-      },
-      {
-        id: 2, name: "Military Flags", location: "568 Broadway", flags: 1, price: 100.00,
-        status: "paid", validThru: "11-11-2026", subscriptionDate: "11-12-2025 / 11-11-2026",
-        heroesEnabled: true,
-        heroes: [{ id: 1, name: "Col. Robert Davis", branch: "Air Force", story: "30 years of service.", photo: null }]
-      },
-      {
-        id: 3, name: "Home Flags", location: "372 Town Place, Fairview TX 75069", flags: 1, price: 50.00,
-        status: "paid", validThru: "11-11-2026", subscriptionDate: "11-12-2025 / 11-11-2026",
-        heroesEnabled: false, heroes: []
-      },
-    ];
+  <!-- ACCOUNT HEADER -->
+  <div class="acct-header">
+    <div class="user">
+      <div class="avatar">ER</div>
+      <div>
+        <div class="name">Emma Romero</div>
+        <div class="since">Customer since 02-17-2026</div>
+      </div>
+    </div>
+    <a href="#" class="cart-btn">🛒 Cart <span class="cart-badge">3</span></a>
+  </div>
 
-    const payments = [
-      { id: 1, date: "3-17-2026", type: "CASH", status: "Paid", amount: 40.00, description: "Field of Heroes – Renewal" },
-      { id: 2, date: "3-17-2026", type: "CASH", status: "Paid", amount: 3.00, description: "Processing Fee" },
-      { id: 3, date: "2-17-2026", type: "CASH", status: "Paid", amount: 100.00, description: "Military Flags – Annual" },
-    ];
+  <!-- TABS -->
+  <div class="tabs">
+    <ul>
+      <li><a href="#" class="tab-link" data-tab="account">Account Info</a></li>
+      <li><a href="#" class="tab-link active" data-tab="subscriptions">Subscriptions</a></li>
+      <li><a href="#" class="tab-link" data-tab="billing">Cart &amp; Payment <span class="tab-badge">3</span></a></li>
+      <li><a href="#" class="tab-link" data-tab="history">Payment History</a></li>
+      <li><a href="#" class="tab-link" data-tab="prefs">Preferences</a></li>
+    </ul>
+  </div>
 
-    const branchColors = {
-      "Army": "bg-green-100 text-green-800", "Navy": "bg-blue-100 text-blue-800",
-      "Air Force": "bg-blue-100 text-blue-800", "Marines": "bg-red-100 text-red-800",
-      "Coast Guard": "bg-orange-100 text-orange-800", "Space Force": "bg-indigo-100 text-indigo-800",
-      "": "bg-gray-100 text-gray-400",
-    };
+  <!-- CONTENT -->
+  <div class="content">
 
-    const tabs = [
-      { id: "account", label: "Account Info" },
-      { id: "subscriptions", label: "Subscriptions" },
-      { id: "billing", label: "Cart & Payment", badge: 3 },
-      { id: "history", label: "Payment History" },
-      { id: "prefs", label: "Preferences" },
-    ];
-
-    function Avatar({ name, photo, size }) {
-      const sz = size === "sm" ? "w-8 h-8 text-xs" : size === "lg" ? "w-14 h-14 text-lg" : "w-10 h-10 text-sm";
-      const initials = name ? name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase() : "?";
-      return photo
-        ? <img src={photo} alt={name} style={{flexShrink:0}} className={`${sz} object-cover`} />
-        : <div style={{flexShrink:0}} className={`${sz} flex items-center justify-center text-white font-bold`} style={{background:"linear-gradient(135deg,#2563eb,#4338ca)",flexShrink:0}}>{initials}</div>;
-    }
-
-    function StatusBadge({ status }) {
-      return status && status.toLowerCase() === "paid"
-        ? <span className="px-2 py-1 text-xs font-semibold bg-green-100 text-green-700">✓ Paid</span>
-        : <span className="px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-700">⏳ Pending</span>;
-    }
-
-    function HeroCard({ hero, idx, onSave }) {
-      const [editing, setEditing] = useState(false);
-      const [form, setForm] = useState({ ...hero });
-      const isEmpty = !hero.name;
-
-      const handleSave = () => { onSave(idx, form); setEditing(false); };
-
-      if (editing) return (
-        <div style={{border:"2px solid #3b82f6",padding:"1rem",background:"#eff6ff"}}>
-          <div style={{display:"flex",gap:"0.75rem",marginBottom:"0.5rem",alignItems:"center"}}>
-            <Avatar name={form.name} photo={form.photo} size="lg" />
-            <div style={{flex:1}}>
-              <p style={{fontSize:"0.7rem",color:"#9ca3af",marginBottom:"0.25rem"}}>Flag #{idx + 1}</p>
-              <input style={{width:"100%",border:"1px solid #d1d5db",padding:"0.375rem 0.75rem",fontSize:"0.875rem",fontWeight:600,boxSizing:"border-box"}}
-                placeholder="Hero Full Name" value={form.name}
-                onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-            </div>
-          </div>
-          <select style={{width:"100%",border:"1px solid #d1d5db",padding:"0.375rem 0.75rem",fontSize:"0.875rem",marginBottom:"0.5rem",boxSizing:"border-box"}}
-            value={form.branch} onChange={e => setForm(f => ({ ...f, branch: e.target.value }))}>
-            <option value="">Select Military Branch</option>
-            {BRANCHES.map(b => <option key={b}>{b}</option>)}
-          </select>
-          <textarea style={{width:"100%",border:"1px solid #d1d5db",padding:"0.375rem 0.75rem",fontSize:"0.875rem",marginBottom:"0.5rem",boxSizing:"border-box"}}
-            rows={3} placeholder="Share this hero's story..." value={form.story}
-            onChange={e => setForm(f => ({ ...f, story: e.target.value }))} />
-          <div style={{display:"flex",gap:"0.5rem",justifyContent:"flex-end"}}>
-            <button onClick={() => { setForm({ ...hero }); setEditing(false); }}
-              style={{padding:"0.375rem 0.75rem",fontSize:"0.875rem",border:"1px solid #d1d5db",cursor:"pointer",background:"#fff"}}>Cancel</button>
-            <button onClick={handleSave}
-              style={{padding:"0.375rem 0.75rem",fontSize:"0.875rem",background:"#2563eb",color:"#fff",border:"none",cursor:"pointer",fontWeight:600}}>Save Hero</button>
-          </div>
+    <!-- ACCOUNT INFO TAB -->
+    <div id="tab-account" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h2>Account Details</h2>
+          <a href="#" style="font-size:0.875rem;color:#2563eb;text-decoration:none;">Edit All</a>
         </div>
-      );
-
-      return (
-        <div onClick={() => setEditing(true)}
-          style={{border: isEmpty ? "1px dashed #d1d5db" : "1px solid #e5e7eb", padding:"1rem", cursor:"pointer", background: isEmpty ? "#f9fafb" : "#fff"}}>
-          {isEmpty ? (
-            <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:"0.5rem",padding:"1rem 0",color:"#9ca3af"}}>
-              <div style={{width:"2.5rem",height:"2.5rem",border:"2px dashed #d1d5db",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.25rem"}}>+</div>
-              <p style={{fontSize:"0.75rem",fontWeight:500}}>Flag #{idx + 1}</p>
-              <p style={{fontSize:"0.75rem"}}>Click to add hero info</p>
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-box">
+              <h3>👤 Customer Information <a href="#">Edit</a></h3>
+              <p>Emma Romero<br/>(555) 555-5555<br/>mygesy@webcodegenie.net</p>
             </div>
-          ) : (
-            <div>
-              <div style={{display:"flex",gap:"0.75rem",alignItems:"center",marginBottom:"0.5rem"}}>
-                <Avatar name={hero.name} photo={hero.photo} />
-                <div style={{flex:1,minWidth:0}}>
-                  <p style={{fontSize:"0.7rem",color:"#9ca3af"}}>Flag #{idx + 1}</p>
-                  <p style={{fontWeight:600,fontSize:"0.875rem",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{hero.name}</p>
-                </div>
-              </div>
-              {hero.branch && <span style={{fontSize:"0.7rem",padding:"0.1rem 0.5rem",background:"#dbeafe",color:"#1e40af",display:"inline-block"}}>{hero.branch}</span>}
-              {hero.story && <p style={{fontSize:"0.75rem",color:"#6b7280",marginTop:"0.25rem"}}>{hero.story}</p>}
+            <div class="info-box">
+              <h3>📍 Billing Information <a href="#">Edit</a></h3>
+              <p>Halla Santana<br/>hezyfik@mailinator.com<br/>Possimus suscipit N, 20418</p>
             </div>
-          )}
-        </div>
-      );
-    }
-
-    function SubscriptionPanel({ sub, onHeroSave }) {
-      const [open, setOpen] = useState(false);
-      const hasHeroes = sub.heroesEnabled !== false;
-      const filled = hasHeroes ? sub.heroes.filter(h => h.name).length : 0;
-      const pct = hasHeroes && sub.flags > 0 ? Math.round((filled / sub.flags) * 100) : 0;
-
-      return (
-        <div style={{border: open ? "1px solid #93c5fd" : "1px solid #e5e7eb", boxShadow:"0 1px 3px rgba(0,0,0,0.1)", overflow:"hidden"}}>
-          <div style={{display:"flex",alignItems:"center",gap:"1rem",padding:"1rem 1.25rem",background:"#fff",cursor: hasHeroes ? "pointer" : "default"}}
-            onClick={() => hasHeroes && setOpen(o => !o)}>
-            <img src={subImages[sub.name]} alt={sub.name} style={{width:"2.75rem",height:"2.75rem",objectFit:"cover",flexShrink:0}} />
-            <div style={{flex:1,minWidth:0}}>
-              <div style={{display:"flex",alignItems:"center",gap:"0.5rem",flexWrap:"wrap"}}>
-                <span style={{fontWeight:700,color:"#1f2937"}}>{sub.name}</span>
-                <StatusBadge status={sub.status} />
-              </div>
-              <p style={{fontSize:"0.75rem",color:"#6b7280",marginTop:"0.25rem"}}>📍 {sub.location} · Valid thru {sub.validThru}</p>
-            </div>
-            <div style={{textAlign:"right",flexShrink:0}}>
-              <p style={{fontWeight:700,color:"#1f2937"}}>${sub.price.toFixed(2)}</p>
-              <p style={{fontSize:"0.75rem",color:"#9ca3af"}}>{sub.flags} flag{sub.flags > 1 ? "s" : ""}</p>
-            </div>
-            <div style={{textAlign:"center",flexShrink:0}}>
-              {hasHeroes ? (
-                <div style={{display:"flex",alignItems:"center",gap:"0.75rem"}}>
-                  <div style={{textAlign:"center"}}>
-                    <p style={{fontSize:"0.875rem",fontWeight:700,color:"#2563eb"}}>{filled}/{sub.flags}</p>
-                    <p style={{fontSize:"0.7rem",color:"#9ca3af"}}>Heroes</p>
-                  </div>
-                  <span style={{color:"#9ca3af",fontSize:"0.75rem",transform: open ? "rotate(180deg)" : "none", display:"inline-block", transition:"transform 0.2s"}}>▼</span>
-                </div>
-              ) : (
-                <div>
-                  <p style={{fontSize:"0.875rem",fontWeight:700,color:"#2563eb"}}>{sub.flags}</p>
-                  <p style={{fontSize:"0.7rem",color:"#9ca3af"}}>Flag{sub.flags > 1 ? "s" : ""}</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {hasHeroes && filled < sub.flags && (
-            <div style={{background:"#fffbeb",borderTop:"1px solid #fef3c7",padding:"0.5rem 1.25rem",display:"flex",alignItems:"center",gap:"0.5rem"}}>
-              <span>⚠️</span>
-              <p style={{fontSize:"0.75rem",color:"#b45309",fontWeight:500}}>{sub.flags - filled} hero slot{sub.flags - filled > 1 ? "s" : ""} need info — click to complete your tribute.</p>
-            </div>
-          )}
-
-          {hasHeroes && open && (
-            <div style={{borderTop:"1px solid #f3f4f6",background:"#f9fafb",padding:"1.25rem"}}>
-              <div style={{display:"flex",justifyContent:"space-between",marginBottom:"0.75rem"}}>
-                <span style={{fontWeight:600,fontSize:"0.875rem",color:"#374151"}}>Honored Heroes</span>
-                <span style={{fontSize:"0.75rem",color:"#9ca3af"}}>{pct}% complete</span>
-              </div>
-              <div style={{background:"#e5e7eb",height:"0.5rem",marginBottom:"1.25rem"}}>
-                <div style={{background:"#2563eb",height:"0.5rem",width:`${pct}%`,transition:"width 0.5s"}} />
-              </div>
-              <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"0.75rem"}}>
-                {sub.heroes.map((hero, idx) => (
-                  <HeroCard key={hero.id} hero={hero} idx={idx}
-                    onSave={(i, data) => onHeroSave(sub.id, i, data)} />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    function CartPaymentTab() {
-      const [flagCounts, setFlagCounts] = useState({ 0: 1, 1: 1 });
-      const [years, setYears] = useState("2");
-      const [autoPay, setAutoPay] = useState(true);
-      const [donation, setDonation] = useState("none");
-      const [payMethod, setPayMethod] = useState("cc");
-      const [smsOptIn, setSmsOptIn] = useState(true);
-      const [cardName, setCardName] = useState("");
-      const [cardNum, setCardNum] = useState("");
-      const [zip, setZip] = useState("");
-      const [mm, setMm] = useState("01");
-      const [yyyy, setYyyy] = useState("2026");
-      const [cvv, setCvv] = useState("");
-
-      const subPrice = 50.00;
-      const numYears = parseInt(years);
-      const multiYearDiscount = numYears >= 2 ? 10.00 : 0;
-      const donationAmt = donation === "none" || donation === "Other" || donation === "Not Now" ? 0 : parseFloat(donation.replace("$",""));
-      const totalFlags = Object.values(flagCounts).reduce((a, b) => a + b, 0);
-      const volumeDiscount = totalFlags >= 4 ? 2.00 : 0;
-      const subs = Array.from({ length: numYears }, (_, i) => ({ label: `Subscription: 11/11/${2025+i} – 11/10/${2026+i}`, price: subPrice }));
-      const subtotalFlags = subPrice * numYears;
-      const totalMultiYear = multiYearDiscount * numYears;
-      const subtotal = subtotalFlags - totalMultiYear - volumeDiscount + donationAmt;
-      const donationOptions = ["$20", "$40", "$60", "$80", "$100", "Other", "Not Now"];
-
-      return (
-        <div style={{display:"flex",gap:"1.25rem",alignItems:"flex-start",flexWrap:"wrap"}}>
-          {/* LEFT */}
-          <div style={{flex:1,minWidth:"300px",display:"flex",flexDirection:"column",gap:"1rem"}}>
-            {/* Cart */}
-            <div style={{background:"#fff",border:"1px solid #e5e7eb",boxShadow:"0 1px 3px rgba(0,0,0,0.1)"}}>
-              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"1rem 1.25rem",borderBottom:"1px solid #f3f4f6"}}>
-                <span style={{fontWeight:700,color:"#1f2937"}}>🛒 Shopping Cart (1)</span>
-                <button style={{fontSize:"0.875rem",border:"1px solid #d1d5db",padding:"0.375rem 0.75rem",cursor:"pointer",background:"#fff"}}>➕ Add Another Location</button>
-                <span style={{fontSize:"0.875rem",fontWeight:600,color:"#4b5563"}}>Price</span>
-              </div>
-              <div style={{padding:"1.25rem"}}>
-                <div style={{display:"flex",gap:"1rem"}}>
-                  <input type="checkbox" defaultChecked style={{marginTop:"0.25rem",flexShrink:0}} />
-                  <img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=120&q=80" alt="flags" style={{width:"5rem",height:"4rem",objectFit:"cover",flexShrink:0}} />
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{display:"flex",justifyContent:"space-between",gap:"0.5rem"}}>
-                      <div>
-                        <span style={{fontWeight:700,color:"#1d4ed8",fontSize:"0.875rem"}}>Home Flag Delivery Membership</span>
-                        <span style={{fontSize:"0.75rem",color:"#6b7280",marginLeft:"0.25rem"}}>(New Subscription)</span>
-                      </div>
-                      <span style={{fontWeight:700,color:"#1f2937",flexShrink:0}}>$100.00</span>
-                    </div>
-                    <p style={{fontSize:"0.75rem",color:"#6b7280",marginTop:"0.25rem"}}>Friends of Fairview will place a 3'x 5' flag in your front yard for 6 holidays per year. <span style={{color:"#3b82f6",cursor:"pointer"}}>Read more</span></p>
-                    <p style={{fontSize:"0.75rem",color:"#6b7280",marginTop:"0.25rem"}}>📍 4251 Irving Ave</p>
-                    <p style={{fontSize:"0.75rem",color:"#1d4ed8",fontWeight:500,marginTop:"0.25rem"}}>Your first delivery will be Veterans Day 2026</p>
-                    <p style={{fontSize:"0.75rem",color:"#6b7280"}}>Subscription Period: Nov 12, 2025 – Nov 11, 2027</p>
-                  </div>
-                </div>
-                <div style={{marginTop:"1rem",paddingLeft:"1.5rem",display:"flex",flexDirection:"column",gap:"0.75rem"}}>
-                  {subs.map((s, i) => (
-                    <div key={i} style={{display:"flex",alignItems:"center",gap:"0.75rem",border:"1px solid #e5e7eb",padding:"0.75rem 1rem",background:"#f9fafb"}}>
-                      <input type="checkbox" defaultChecked style={{flexShrink:0}} />
-                      <div style={{flex:1}}>
-                        <p style={{fontSize:"0.875rem",fontWeight:500,color:"#374151"}}>{s.label}</p>
-                        <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginTop:"0.25rem"}}>
-                          <span style={{fontSize:"0.75rem",color:"#6b7280"}}>Flag Count:</span>
-                          <button onClick={() => setFlagCounts(f => ({ ...f, [i]: Math.max(1, (f[i]||1)-1) }))}
-                            style={{width:"1.25rem",height:"1.25rem",border:"1px solid #d1d5db",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"0.75rem"}}>−</button>
-                          <span style={{fontSize:"0.875rem",fontWeight:600,minWidth:"1rem",textAlign:"center"}}>{flagCounts[i]||1}</span>
-                          <button onClick={() => setFlagCounts(f => ({ ...f, [i]: (f[i]||1)+1 }))}
-                            style={{width:"1.25rem",height:"1.25rem",border:"1px solid #d1d5db",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"0.75rem"}}>+</button>
-                        </div>
-                      </div>
-                      <div style={{display:"flex",alignItems:"center",gap:"0.5rem"}}>
-                        <span style={{fontWeight:600,color:"#1f2937",fontSize:"0.875rem"}}>${s.price.toFixed(2)}</span>
-                        <span style={{color:"#9ca3af",cursor:"pointer",fontSize:"0.875rem"}}>🗑️</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div style={{marginTop:"1.25rem",paddingLeft:"1.5rem"}}>
-                  <p style={{fontSize:"0.875rem",color:"#4b5563",marginBottom:"0.5rem"}}>Upgrade your subscription – add another year</p>
-                  <div style={{display:"flex",flexWrap:"wrap",gap:"0.5rem 1rem"}}>
-                    {["1","2","3","4","5","6","7","8","9","10"].map(y => (
-                      <label key={y} style={{display:"flex",alignItems:"center",gap:"0.25rem",fontSize:"0.875rem",cursor:"pointer"}}>
-                        <input type="radio" name="years" value={y} checked={years===y} onChange={()=>setYears(y)} /> Buy {y} Year{y!=="1"?"s":""}
-                      </label>
-                    ))}
-                  </div>
-                  <div style={{display:"flex",alignItems:"center",gap:"0.75rem",marginTop:"0.75rem"}}>
-                    <span style={{fontSize:"0.75rem",color:"#3b82f6",cursor:"pointer"}}>Auto-Pay may be disabled at any time on the preference tab</span>
-                    <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginLeft:"auto"}}>
-                      <span style={{fontSize:"0.875rem",color:"#4b5563"}}>Auto-Pay</span>
-                      <div onClick={()=>setAutoPay(a=>!a)} style={{width:"2.5rem",height:"1.25rem",background:autoPay?"#2563eb":"#d1d5db",cursor:"pointer",position:"relative",transition:"background 0.2s"}}>
-                        <div style={{position:"absolute",top:"0.125rem",width:"1rem",height:"1rem",background:"#fff",boxShadow:"0 1px 2px rgba(0,0,0,0.2)",left:autoPay?"1.375rem":"0.125rem",transition:"left 0.2s"}} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div style={{display:"flex",justifyContent:"space-between",marginTop:"1rem",paddingTop:"1rem",borderTop:"1px solid #f3f4f6",paddingLeft:"1.5rem"}}>
-                  <span style={{fontSize:"0.875rem",color:"#4b5563"}}>First Delivery:</span>
-                  <span style={{fontSize:"0.875rem",fontWeight:600,color:"#1f2937"}}>Veterans Day 2026</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Add Another Product */}
-            <div style={{background:"#fff",border:"1px solid #e5e7eb",boxShadow:"0 1px 3px rgba(0,0,0,0.1)"}}>
-              <div style={{padding:"1rem 1.25rem",borderBottom:"1px solid #f3f4f6"}}>
-                <p style={{fontWeight:700,color:"#1f2937",fontSize:"0.875rem"}}>Add Another Product</p>
-                <p style={{fontSize:"0.75rem",color:"#6b7280",marginTop:"0.125rem"}}>Check out our other products</p>
-              </div>
-              <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",borderTop:"1px solid #f3f4f6"}}>
-                {[
-                  { name: "Field of Heroes", desc: "Honor a veteran with a flag displayed at our Field of Heroes event.", img: "https://i.ibb.co/39KHyB1c/FHlogo.png" },
-                  { name: "Military Flags", desc: "Proudly display a military flag at your home or business address.", img: "https://i.ibb.co/sJRfyKZx/Donation-Image.jpg" },
-                  { name: "Home Flags", desc: "Have a 3'x5' flag placed in your yard for 6 holidays per year.", img: "https://i.ibb.co/3mpmJVZP/USA-Flag.jpg" },
-                ].map((p, i) => (
-                  <div key={p.name} style={{display:"flex",flexDirection:"column",alignItems:"center",textAlign:"center",padding:"1rem",borderLeft: i > 0 ? "1px solid #f3f4f6" : "none", cursor:"pointer"}}>
-                    <img src={p.img} alt={p.name} style={{width:"100%",aspectRatio:"1/1",objectFit:"cover",marginBottom:"0.75rem"}} />
-                    <p style={{fontWeight:600,fontSize:"0.875rem",color:"#1f2937",marginBottom:"0.25rem"}}>{p.name}</p>
-                    <p style={{fontSize:"0.7rem",color:"#6b7280",lineHeight:"1.4",marginBottom:"0.75rem",flex:1}}>{p.desc}</p>
-                    <button style={{width:"100%",background:"#1d4ed8",color:"#fff",border:"none",padding:"0.5rem",fontSize:"0.75rem",fontWeight:600,cursor:"pointer"}}>Add to Cart</button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Donation */}
-            <div style={{background:"#fff",border:"1px solid #e5e7eb",padding:"1.25rem",boxShadow:"0 1px 3px rgba(0,0,0,0.1)"}}>
-              <div style={{display:"flex",alignItems:"center",gap:"0.5rem",marginBottom:"0.75rem"}}>
-                <span style={{fontSize:"1.25rem"}}>✨</span>
-                <p style={{fontWeight:700,color:"#1d4ed8",fontSize:"0.875rem"}}>Please Consider An Additional Donation To:</p>
-              </div>
-              <div style={{display:"flex",gap:"1rem",marginBottom:"0.75rem"}}>
-                <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=120&q=80" alt="donation" style={{width:"4rem",height:"4rem",objectFit:"cover",flexShrink:0}} />
-                <div>
-                  <p style={{fontWeight:600,fontSize:"0.875rem",color:"#1f2937"}}>Test Donation Label for Testing VB</p>
-                  <p style={{fontSize:"0.75rem",color:"#6b7280",marginTop:"0.25rem"}}>This is the test additional donation description... <span style={{color:"#3b82f6",cursor:"pointer"}}>read more</span></p>
-                </div>
-              </div>
-              <div style={{display:"flex",flexWrap:"wrap",gap:"0.5rem"}}>
-                {donationOptions.map(opt => (
-                  <label key={opt} style={{display:"flex",alignItems:"center",gap:"0.375rem",padding:"0.375rem 0.75rem",border: donation===opt ? "1px solid #2563eb" : "1px solid #d1d5db",background: donation===opt ? "#2563eb" : "#fff",color: donation===opt ? "#fff" : "#374151",fontSize:"0.875rem",cursor:"pointer"}}>
-                    <input type="radio" name="donation" value={opt} checked={donation===opt} onChange={()=>setDonation(opt)} style={{display:"none"}} />{opt}
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* RIGHT */}
-          <div style={{width:"18rem",flexShrink:0,display:"flex",flexDirection:"column",gap:"1rem"}}>
-            {/* Summary */}
-            <div style={{border:"1px solid #bfdbfe",boxShadow:"0 1px 3px rgba(0,0,0,0.1)",overflow:"hidden"}}>
-              <div style={{background:"#1d4ed8",padding:"0.75rem 1.25rem"}}>
-                <p style={{fontWeight:700,color:"#fff",fontSize:"0.875rem"}}>Shopping Cart Summary</p>
-              </div>
-              <div style={{padding:"1rem 1.25rem",background:"#eff6ff",display:"flex",flexDirection:"column",gap:"0.5rem"}}>
-                <p style={{fontWeight:600,color:"#1f2937",fontSize:"0.875rem"}}>Home Flag Delivery Membership</p>
-                {subs.map((s, i) => (
-                  <div key={i}>
-                    <div style={{display:"flex",justifyContent:"space-between",fontSize:"0.75rem",color:"#4b5563"}}>
-                      <span>{s.label}</span><span style={{fontWeight:500}}>${s.price.toFixed(2)}</span>
-                    </div>
-                    {multiYearDiscount > 0 && <div style={{display:"flex",justifyContent:"space-between",fontSize:"0.75rem",color:"#dc2626"}}>
-                      <span>Multi-Year Discount (min. 2 yrs)</span><span>−${multiYearDiscount.toFixed(2)}</span>
-                    </div>}
-                  </div>
-                ))}
-                <div style={{borderTop:"1px solid #bfdbfe",paddingTop:"0.5rem",display:"flex",flexDirection:"column",gap:"0.375rem"}}>
-                  <div style={{display:"flex",justifyContent:"space-between",fontSize:"0.875rem",color:"#374151"}}><span>Total Flag Subscriptions</span><span style={{fontWeight:600}}>${subtotalFlags.toFixed(2)}</span></div>
-                  {volumeDiscount > 0 && <div style={{display:"flex",justifyContent:"space-between",fontSize:"0.875rem",color:"#dc2626"}}><span>Total Volume Discount</span><span>−${volumeDiscount.toFixed(2)}</span></div>}
-                  {totalMultiYear > 0 && <div style={{display:"flex",justifyContent:"space-between",fontSize:"0.875rem",color:"#dc2626"}}><span>Total Multi-Year Discount</span><span>−${totalMultiYear.toFixed(2)}</span></div>}
-                  <div style={{display:"flex",justifyContent:"space-between",fontSize:"0.875rem",color:"#374151"}}><span>Additional Donation</span><span>${donationAmt.toFixed(2)}</span></div>
-                </div>
-                <div style={{borderTop:"1px solid #bfdbfe",paddingTop:"0.5rem"}}>
-                  <div style={{display:"flex",justifyContent:"space-between",fontSize:"0.875rem",fontWeight:600,color:"#1f2937"}}><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
-                  <div style={{display:"flex",justifyContent:"space-between",fontWeight:700,color:"#1d4ed8",fontSize:"1rem",marginTop:"0.25rem"}}><span>Total</span><span>${subtotal.toFixed(2)}</span></div>
-                </div>
-                <p style={{fontSize:"0.7rem",color:"#9ca3af"}}>Volume Discount applied automatically based on flag count per subscription.</p>
-              </div>
-            </div>
-
-            {/* Payment */}
-            <div style={{background:"#fff",border:"1px solid #e5e7eb",overflow:"hidden",boxShadow:"0 1px 3px rgba(0,0,0,0.1)"}}>
-              <div style={{background:"#1d4ed8",padding:"0.75rem 1.25rem"}}>
-                <p style={{fontWeight:700,color:"#fff",fontSize:"0.875rem"}}>Payment Method</p>
-              </div>
-              <div style={{padding:"1rem 1.25rem",display:"flex",flexDirection:"column",gap:"0.75rem"}}>
-                <div style={{display:"flex",gap:"1rem"}}>
-                  {[["cc","💳 Credit Card"],["echeck","🏦 eCheck"]].map(([val,label])=>(
-                    <label key={val} style={{display:"flex",alignItems:"center",gap:"0.375rem",fontSize:"0.875rem",cursor:"pointer"}}>
-                      <input type="radio" name="pay" value={val} checked={payMethod===val} onChange={()=>setPayMethod(val)} />{label}
-                    </label>
-                  ))}
-                </div>
-                {[{label:"Cardholder's Name",val:cardName,set:setCardName,ph:"e.g. John Smith"},{label:"Card Number",val:cardNum,set:setCardNum,ph:"0000000000000000"}].map(f=>(
-                  <div key={f.label}>
-                    <label style={{fontSize:"0.75rem",color:"#6b7280",fontWeight:500}}>{f.label}</label>
-                    <input style={{width:"100%",border:"1px solid #d1d5db",padding:"0.5rem 0.75rem",fontSize:"0.875rem",marginTop:"0.25rem",boxSizing:"border-box"}}
-                      placeholder={f.ph} value={f.val} onChange={e=>f.set(e.target.value)} />
-                  </div>
-                ))}
-                <div>
-                  <label style={{fontSize:"0.75rem",color:"#6b7280",fontWeight:500}}>Billing Zip</label>
-                  <input style={{width:"100%",border:"1px solid #d1d5db",padding:"0.5rem 0.75rem",fontSize:"0.875rem",marginTop:"0.25rem",boxSizing:"border-box"}}
-                    placeholder="00000" value={zip} onChange={e=>setZip(e.target.value)} />
-                </div>
-                <div style={{display:"flex",gap:"0.5rem"}}>
-                  {[{label:"MM",val:mm,set:setMm,opts:Array.from({length:12},(_,i)=>String(i+1).padStart(2,"0"))},
-                    {label:"YYYY",val:yyyy,set:setYyyy,opts:Array.from({length:10},(_,i)=>String(2025+i))}].map(f=>(
-                    <div key={f.label} style={{flex:1}}>
-                      <label style={{fontSize:"0.75rem",color:"#6b7280",fontWeight:500}}>{f.label}</label>
-                      <select style={{width:"100%",border:"1px solid #d1d5db",padding:"0.5rem 0.375rem",fontSize:"0.875rem",marginTop:"0.25rem",boxSizing:"border-box"}}
-                        value={f.val} onChange={e=>f.set(e.target.value)}>
-                        {f.opts.map(o=><option key={o}>{o}</option>)}
-                      </select>
-                    </div>
-                  ))}
-                  <div style={{flex:1}}>
-                    <label style={{fontSize:"0.75rem",color:"#6b7280",fontWeight:500}}>CVV</label>
-                    <input style={{width:"100%",border:"1px solid #d1d5db",padding:"0.5rem 0.375rem",fontSize:"0.875rem",marginTop:"0.25rem",boxSizing:"border-box"}}
-                      placeholder="000" value={cvv} onChange={e=>setCvv(e.target.value)} maxLength={4} />
-                  </div>
-                </div>
-                <p style={{fontSize:"0.75rem",color:"#9ca3af"}}>After submitting your payment you will receive an e-mail receipt to the address registered above.</p>
-                <label style={{display:"flex",alignItems:"flex-start",gap:"0.5rem",cursor:"pointer"}}>
-                  <input type="checkbox" checked={smsOptIn} onChange={()=>setSmsOptIn(s=>!s)} style={{marginTop:"0.125rem",flexShrink:0}} />
-                  <span style={{fontSize:"0.75rem",color:"#4b5563"}}><strong>Don't miss delivery notifications</strong> – Opt-In to SMS Text Messaging. Reply <strong>HELP</strong> for help, <strong>STOP</strong> to cancel.</span>
-                </label>
-                <p style={{fontSize:"0.75rem",color:"#dc2626",textAlign:"center",fontWeight:500}}>Click "Place my Order" only once</p>
-                <button style={{width:"100%",background:"#16a34a",color:"#fff",border:"none",padding:"0.75rem",fontWeight:700,cursor:"pointer",fontSize:"0.875rem"}}>Place my Order</button>
-              </div>
+            <div class="info-box">
+              <h3>💳 Credit Card <a href="#">Edit</a></h3>
+              <p>Status: ✅ Valid<br/>Auto Pay: OFF</p>
             </div>
           </div>
         </div>
-      );
-    }
+      </div>
+      <div class="danger-box">
+        <div class="text">
+          <h4>Close Account</h4>
+          <p>Cancel all subscriptions and permanently close your account.</p>
+        </div>
+        <button class="btn-danger">Cancel &amp; Close</button>
+      </div>
+    </div>
 
-    function PaymentHistoryTab() {
-      const total = payments.reduce((s, p) => s + p.amount, 0);
-      return (
-        <div style={{display:"flex",flexDirection:"column",gap:"1.25rem"}}>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"1rem"}}>
-            {[
-              { label: "Total Paid", value: `$${total.toFixed(2)}`, icon: "💰", color: "#059669" },
-              { label: "Transactions", value: payments.length, icon: "📄", color: "#2563eb" },
-              { label: "Last Payment", value: payments[0].date, icon: "📅", color: "#1f2937" },
-            ].map(s => (
-              <div key={s.label} style={{background:"#fff",padding:"1rem",border:"1px solid #e5e7eb",textAlign:"center",boxShadow:"0 1px 3px rgba(0,0,0,0.1)"}}>
-                <p style={{fontSize:"1.5rem",marginBottom:"0.25rem"}}>{s.icon}</p>
-                <p style={{fontSize:"1.25rem",fontWeight:700,color:s.color}}>{s.value}</p>
-                <p style={{fontSize:"0.75rem",color:"#6b7280",marginTop:"0.125rem"}}>{s.label}</p>
-              </div>
-            ))}
+    <!-- SUBSCRIPTIONS TAB -->
+    <div id="tab-subscriptions" class="tab-panel active">
+      <div class="grid-3">
+        <div class="stat-card"><div class="icon">📋</div><div class="value" style="color:#1d4ed8">3</div><div class="label">Active Subscriptions</div></div>
+        <div class="stat-card"><div class="icon">🏅</div><div class="value" style="color:#4338ca">3</div><div class="label">Heroes Honored</div></div>
+        <div class="stat-card"><div class="icon">⏳</div><div class="value" style="color:#d97706">$50.00</div><div class="label">Amount Pending</div></div>
+      </div>
+
+      <!-- Field of Heroes -->
+      <div class="sub-row" id="sub-1">
+        <div class="sub-row-header" onclick="toggleSub('sub-1')">
+          <img src="https://i.ibb.co/39KHyB1c/FHlogo.png" alt="Field of Heroes"/>
+          <div class="info">
+            <div class="title-row">
+              <span class="sub-name">Field of Heroes</span>
+              <span class="badge-pending">⏳ Pending</span>
+            </div>
+            <div class="sub-loc">📍 3434 Hwy 6 &nbsp;·&nbsp; Valid thru 11-11-2026</div>
           </div>
-          <div style={{background:"#fff",border:"1px solid #e5e7eb",overflow:"hidden",boxShadow:"0 1px 3px rgba(0,0,0,0.1)"}}>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"1rem 1.5rem",borderBottom:"1px solid #f3f4f6"}}>
-              <p style={{fontWeight:700,color:"#1f2937"}}>Payment Details</p>
-              <button style={{fontSize:"0.875rem",fontWeight:500,color:"#fff",background:"#1d4ed8",padding:"0.5rem 1rem",border:"none",cursor:"pointer"}}>📬 Reach out to Flag Manager</button>
-            </div>
-            <div style={{overflowX:"auto"}}>
-              <table style={{width:"100%",borderCollapse:"collapse"}}>
-                <thead>
-                  <tr style={{background:"#f9fafb"}}>
-                    {["Date","Description","Type","Amount"].map(h=>(
-                      <th key={h} style={{padding:"0.75rem 1.5rem",textAlign:"left",fontSize:"0.75rem",fontWeight:600,color:"#6b7280",textTransform:"uppercase",letterSpacing:"0.05em"}}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {payments.map(p => (
-                    <tr key={p.id} style={{borderTop:"1px solid #f3f4f6"}}>
-                      <td style={{padding:"1rem 1.5rem"}}>
-                        <p style={{fontSize:"0.875rem",fontWeight:500,color:"#1f2937"}}>{p.date}</p>
-                        <StatusBadge status={p.status} />
-                      </td>
-                      <td style={{padding:"1rem 1.5rem",fontSize:"0.875rem",color:"#374151"}}>{p.description}</td>
-                      <td style={{padding:"1rem 1.5rem"}}><span style={{fontSize:"0.75rem",fontWeight:600,background:"#dbeafe",color:"#1d4ed8",padding:"0.125rem 0.5rem"}}>{p.type}</span></td>
-                      <td style={{padding:"1rem 1.5rem"}}>
-                        <div style={{display:"flex",alignItems:"center",gap:"0.5rem",justifyContent:"flex-end"}}>
-                          <span style={{fontWeight:700,color:"#1f2937"}}>${p.amount.toFixed(2)}</span>
-                          <button style={{background:"none",border:"none",cursor:"pointer",color:"#9ca3af",fontSize:"0.875rem"}}>📄</button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div style={{display:"flex",justifyContent:"flex-end",padding:"1rem 1.5rem",borderTop:"1px solid #f3f4f6",background:"#f9fafb"}}>
-              <div style={{textAlign:"right"}}>
-                <p style={{fontSize:"0.75rem",color:"#6b7280",textTransform:"uppercase",fontWeight:600}}>Total</p>
-                <p style={{fontSize:"1.125rem",fontWeight:700,color:"#1f2937"}}>${total.toFixed(2)}</p>
+          <div class="price-col">
+            <div class="price">$50.00</div>
+            <div class="flags">10 flags</div>
+          </div>
+          <div class="hero-col">
+            <div class="hcount">2/10</div>
+            <div class="hlabel">Heroes</div>
+          </div>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="sub-warning">⚠️ 8 hero slots need info — click to complete your tribute.</div>
+        <div class="sub-heroes">
+          <div class="heroes-header"><span>Honored Heroes</span><small>20% complete</small></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:20%"></div></div>
+          <div class="hero-grid">
+            <div class="hero-card">
+              <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.4rem;">
+                <div class="hero-avatar">JW</div>
+                <div style="min-width:0;">
+                  <div class="hero-flag">Flag #1</div>
+                  <div class="hero-name">Sgt. James Walker</div>
+                </div>
+                <button class="hero-edit-btn">✏️ Edit</button>
               </div>
+              <div class="hero-branch">Army</div>
+              <div class="hero-story">Served two tours in Afghanistan.</div>
+            </div>
+            <div class="hero-card">
+              <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.4rem;">
+                <div class="hero-avatar">MC</div>
+                <div style="min-width:0;">
+                  <div class="hero-flag">Flag #2</div>
+                  <div class="hero-name">Lt. Maria Chen</div>
+                </div>
+                <button class="hero-edit-btn">✏️ Edit</button>
+              </div>
+              <div class="hero-branch">Navy</div>
+              <div class="hero-story">Decorated naval officer.</div>
+            </div>
+            <div class="hero-card empty"><div class="plus">+</div><div>Flag #3</div><div>Click to add hero info</div></div>
+            <div class="hero-card empty"><div class="plus">+</div><div>Flag #4</div><div>Click to add hero info</div></div>
+            <div class="hero-card empty"><div class="plus">+</div><div>Flag #5</div><div>Click to add hero info</div></div>
+            <div class="hero-card empty"><div class="plus">+</div><div>Flag #6</div><div>Click to add hero info</div></div>
+            <div class="hero-card empty"><div class="plus">+</div><div>Flag #7</div><div>Click to add hero info</div></div>
+            <div class="hero-card empty"><div class="plus">+</div><div>Flag #8</div><div>Click to add hero info</div></div>
+            <div class="hero-card empty"><div class="plus">+</div><div>Flag #9</div><div>Click to add hero info</div></div>
+            <div class="hero-card empty"><div class="plus">+</div><div>Flag #10</div><div>Click to add hero info</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Military Flags -->
+      <div class="sub-row" id="sub-2">
+        <div class="sub-row-header" onclick="toggleSub('sub-2')">
+          <img src="https://i.ibb.co/sJRfyKZx/Donation-Image.jpg" alt="Military Flags"/>
+          <div class="info">
+            <div class="title-row">
+              <span class="sub-name">Military Flags</span>
+              <span class="badge-paid">✓ Paid</span>
+            </div>
+            <div class="sub-loc">📍 568 Broadway &nbsp;·&nbsp; Valid thru 11-11-2026</div>
+          </div>
+          <div class="price-col">
+            <div class="price">$100.00</div>
+            <div class="flags">1 flag</div>
+          </div>
+          <div class="hero-col">
+            <div class="hcount">1/1</div>
+            <div class="hlabel">Heroes</div>
+          </div>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="sub-heroes">
+          <div class="heroes-header"><span>Honored Heroes</span><small>100% complete</small></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+          <div class="hero-grid">
+            <div class="hero-card">
+              <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.4rem;">
+                <div class="hero-avatar">RD</div>
+                <div style="min-width:0;">
+                  <div class="hero-flag">Flag #1</div>
+                  <div class="hero-name">Col. Robert Davis</div>
+                </div>
+                <button class="hero-edit-btn">✏️ Edit</button>
+              </div>
+              <div class="hero-branch">Air Force</div>
+              <div class="hero-story">30 years of service.</div>
             </div>
           </div>
         </div>
-      );
-    }
+      </div>
 
-    function App() {
-      const [activeTab, setActiveTab] = useState("billing");
-      const [subs, setSubs] = useState(initialSubscriptions);
-
-      const handleHeroSave = (subId, heroIdx, data) => {
-        setSubs(prev => prev.map(s => s.id !== subId ? s : {
-          ...s, heroes: s.heroes.map((h, i) => i === heroIdx ? { ...h, ...data } : h)
-        }));
-      };
-
-      const totalHeroes = subs.reduce((acc, s) => acc + s.heroes.filter(h => h.name).length, 0);
-      const totalPending = subs.filter(s => s.status === "pending").reduce((acc, s) => acc + s.price, 0);
-
-      return (
-        <div style={{minHeight:"100vh",background:"#f3f4f6",fontFamily:"system-ui,sans-serif"}}>
-          {/* Top nav */}
-          <div style={{background:"linear-gradient(to right,#1e3a8a,#3730a3)",color:"#fff",padding:"0.75rem 1.5rem"}}>
-            <div style={{maxWidth:"64rem",margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-              <span style={{fontWeight:700,fontSize:"0.875rem"}}>🏠 Friends of Fairview</span>
-              <div style={{display:"flex",gap:"1rem",fontSize:"0.875rem"}}>
-                <span style={{opacity:0.8,cursor:"pointer"}}>🌐 Club Website</span>
-                <span style={{opacity:0.8,cursor:"pointer"}}>❓ Help</span>
-                <span style={{opacity:0.8,cursor:"pointer"}}>↪️ Sign Out</span>
-              </div>
+      <!-- Home Flags (no heroes) -->
+      <div class="sub-row" id="sub-3">
+        <div class="sub-row-header" style="cursor:default;">
+          <img src="https://i.ibb.co/3mpmJVZP/USA-Flag.jpg" alt="Home Flags"/>
+          <div class="info">
+            <div class="title-row">
+              <span class="sub-name">Home Flags</span>
+              <span class="badge-paid">✓ Paid</span>
             </div>
+            <div class="sub-loc">📍 372 Town Place, Fairview TX 75069 &nbsp;·&nbsp; Valid thru 11-11-2026</div>
           </div>
+          <div class="price-col">
+            <div class="price">$50.00</div>
+            <div class="flags">1 flag</div>
+          </div>
+          <div class="hero-col">
+            <div class="hcount">1</div>
+            <div class="hlabel">Flag</div>
+          </div>
+        </div>
+      </div>
 
-          {/* Banner */}
-          <div style={{height:"5rem",background:"linear-gradient(to right,#1e40af,#3730a3)",display:"flex",alignItems:"center",padding:"0 1.5rem"}}>
-            <div style={{maxWidth:"64rem",margin:"0 auto"}}>
-              <p style={{color:"rgba(255,255,255,0.7)",fontSize:"0.875rem",fontStyle:"italic"}}>Honoring those who served 🇺🇸</p>
+      <button class="dashed-btn">+ Add Another Flag Location</button>
+    </div>
+
+    <!-- CART & PAYMENT TAB -->
+    <div id="tab-billing" class="tab-panel">
+      <div class="cart-layout">
+        <div class="cart-left">
+
+          <!-- Cart Item -->
+          <div class="card">
+            <div class="card-header">
+              <div style="display:flex;align-items:center;gap:0.5rem;font-weight:700;color:#1f2937;">🛒 Shopping Cart (1)</div>
+              <button class="add-location-btn">➕ Add Another Location</button>
+              <span style="font-size:0.875rem;font-weight:600;color:#4b5563;">Price</span>
             </div>
-          </div>
-
-          {/* Account header */}
-          <div style={{background:"#fff",borderBottom:"1px solid #e5e7eb",padding:"1rem 1.5rem",boxShadow:"0 1px 3px rgba(0,0,0,0.1)"}}>
-            <div style={{maxWidth:"64rem",margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-              <div style={{display:"flex",alignItems:"center",gap:"0.75rem"}}>
-                <Avatar name="Emma Romero" size="md" />
-                <div>
-                  <p style={{fontWeight:700,color:"#1f2937"}}>Emma Romero</p>
-                  <p style={{fontSize:"0.75rem",color:"#9ca3af"}}>Customer since 02-17-2026</p>
-                </div>
-              </div>
-              <button style={{display:"flex",alignItems:"center",gap:"0.5rem",fontSize:"0.875rem",color:"#1d4ed8",fontWeight:600,border:"1px solid #bfdbfe",padding:"0.5rem 1rem",cursor:"pointer",background:"#fff"}}>
-                🛒 Cart <span style={{background:"#2563eb",color:"#fff",fontSize:"0.75rem",width:"1.25rem",height:"1.25rem",display:"flex",alignItems:"center",justifyContent:"center"}}>3</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Tabs */}
-          <div style={{background:"#fff",borderBottom:"1px solid #e5e7eb",position:"sticky",top:0,zIndex:10,boxShadow:"0 1px 3px rgba(0,0,0,0.1)"}}>
-            <div style={{maxWidth:"64rem",margin:"0 auto",display:"flex",overflowX:"auto"}}>
-              {tabs.map(t => (
-                <button key={t.id} onClick={() => setActiveTab(t.id)}
-                  style={{display:"flex",alignItems:"center",gap:"0.375rem",padding:"0.875rem 1rem",fontSize:"0.875rem",fontWeight:500,whiteSpace:"nowrap",
-                    borderBottom: activeTab===t.id ? "2px solid #2563eb" : "2px solid transparent",
-                    color: activeTab===t.id ? "#1d4ed8" : "#6b7280",background:"none",border:"none",
-                    borderBottom: activeTab===t.id ? "2px solid #2563eb" : "2px solid transparent",
-                    cursor:"pointer",transition:"color 0.2s"}}>
-                  {t.label}
-                  {t.badge && <span style={{background:"#2563eb",color:"#fff",fontSize:"0.7rem",width:"1rem",height:"1rem",display:"flex",alignItems:"center",justifyContent:"center"}}>{t.badge}</span>}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div style={{maxWidth:"64rem",margin:"0 auto",padding:"1.5rem 1rem",display:"flex",flexDirection:"column",gap:"1.25rem"}}>
-
-            {activeTab === "account" && (
-              <div style={{display:"flex",flexDirection:"column",gap:"1rem"}}>
-                <div style={{background:"#fff",padding:"1.5rem",border:"1px solid #e5e7eb",boxShadow:"0 1px 3px rgba(0,0,0,0.1)"}}>
-                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:"1.25rem"}}>
-                    <p style={{fontWeight:700,color:"#1f2937",fontSize:"1.125rem"}}>Account Details</p>
-                    <button style={{fontSize:"0.875rem",color:"#2563eb",background:"none",border:"none",cursor:"pointer"}}>Edit All</button>
-                  </div>
-                  <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"1rem"}}>
-                    {[
-                      { label:"Customer Information", icon:"👤", lines:["Emma Romero","(555) 555-5555","mygesy@webcodegenie.net"] },
-                      { label:"Billing Information", icon:"📍", lines:["Halla Santana","hezyfik@mailinator.com","Possimus suscipit N, 20418"] },
-                      { label:"Credit Card", icon:"💳", lines:["Status: ✅ Valid","Auto Pay: OFF"] },
-                    ].map(card => (
-                      <div key={card.label} style={{border:"1px solid #e5e7eb",padding:"1rem"}}>
-                        <div style={{display:"flex",justifyContent:"space-between",marginBottom:"0.75rem"}}>
-                          <p style={{fontSize:"0.875rem",fontWeight:600,color:"#374151"}}>{card.icon} {card.label}</p>
-                          <button style={{fontSize:"0.75rem",color:"#3b82f6",background:"none",border:"none",cursor:"pointer",fontWeight:500}}>Edit</button>
-                        </div>
-                        {card.lines.map((l,i)=><p key={i} style={{fontSize:"0.875rem",color:"#4b5563",lineHeight:"1.6"}}>{l}</p>)}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div style={{background:"#fff",padding:"1.25rem",border:"1px solid #fee2e2",boxShadow:"0 1px 3px rgba(0,0,0,0.1)"}}>
-                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+            <div class="card-body">
+              <div class="cart-item">
+                <input type="checkbox" checked style="margin-top:0.25rem;flex-shrink:0;"/>
+                <img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=120&q=80" alt="flags"/>
+                <div class="details">
+                  <div style="display:flex;justify-content:space-between;gap:0.5rem;">
                     <div>
-                      <p style={{fontWeight:600,color:"#b91c1c",fontSize:"0.875rem"}}>Close Account</p>
-                      <p style={{fontSize:"0.75rem",color:"#6b7280",marginTop:"0.125rem"}}>Cancel all subscriptions and permanently close your account.</p>
+                      <span class="item-title">Home Flag Delivery Membership</span>
+                      <span class="item-sub"> (New Subscription)</span>
                     </div>
-                    <button style={{padding:"0.5rem 1rem",fontSize:"0.875rem",background:"#dc2626",color:"#fff",border:"none",cursor:"pointer",fontWeight:500}}>Cancel & Close</button>
+                    <span class="item-price">$100.00</span>
+                  </div>
+                  <p class="item-sub" style="margin-top:0.25rem;">Friends of Fairview will place a 3'x 5' flag in your front yard for 6 holidays per year. <a href="#" style="color:#3b82f6;">Read more</a></p>
+                  <p class="item-sub" style="margin-top:0.25rem;">📍 4251 Irving Ave</p>
+                  <p style="font-size:0.75rem;color:#1d4ed8;font-weight:500;margin-top:0.25rem;">Your first delivery will be Veterans Day 2026</p>
+                  <p class="item-sub">Subscription Period: Nov 12, 2025 – Nov 11, 2027</p>
+                </div>
+              </div>
+              <div class="sub-year-rows">
+                <div class="sub-year-row">
+                  <input type="checkbox" checked/>
+                  <div class="year-label">
+                    Subscription: 11/11/2025 – 11/10/2026
+                    <div class="flag-count">
+                      Flag Count:
+                      <button onclick="changeFlag('f1',-1)">−</button>
+                      <span id="f1">1</span>
+                      <button onclick="changeFlag('f1',1)">+</button>
+                    </div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:0.5rem;">
+                    <span style="font-weight:600;font-size:0.875rem;">$50.00</span>
+                    <span style="color:#9ca3af;cursor:pointer;">🗑️</span>
+                  </div>
+                </div>
+                <div class="sub-year-row">
+                  <input type="checkbox" checked/>
+                  <div class="year-label">
+                    Subscription: 11/11/2026 – 11/10/2027
+                    <div class="flag-count">
+                      Flag Count:
+                      <button onclick="changeFlag('f2',-1)">−</button>
+                      <span id="f2">1</span>
+                      <button onclick="changeFlag('f2',1)">+</button>
+                    </div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:0.5rem;">
+                    <span style="font-weight:600;font-size:0.875rem;">$50.00</span>
+                    <span style="color:#9ca3af;cursor:pointer;">🗑️</span>
                   </div>
                 </div>
               </div>
-            )}
-
-            {activeTab === "subscriptions" && (
-              <div style={{display:"flex",flexDirection:"column",gap:"1.25rem"}}>
-                <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"1rem"}}>
-                  {[
-                    { label:"Active Subscriptions", value:subs.length, icon:"📋", color:"#1d4ed8" },
-                    { label:"Heroes Honored", value:totalHeroes, icon:"🏅", color:"#4338ca" },
-                    { label:"Amount Pending", value:`$${totalPending.toFixed(2)}`, icon:"⏳", color:"#d97706" },
-                  ].map(s=>(
-                    <div key={s.label} style={{background:"#fff",padding:"1rem",border:"1px solid #e5e7eb",textAlign:"center",boxShadow:"0 1px 3px rgba(0,0,0,0.1)"}}>
-                      <p style={{fontSize:"1.5rem",marginBottom:"0.25rem"}}>{s.icon}</p>
-                      <p style={{fontSize:"1.5rem",fontWeight:700,color:s.color}}>{s.value}</p>
-                      <p style={{fontSize:"0.75rem",color:"#6b7280",marginTop:"0.125rem"}}>{s.label}</p>
-                    </div>
-                  ))}
+              <div class="year-opts">
+                <p>Upgrade your subscription – add another year</p>
+                <div class="year-radios">
+                  <label><input type="radio" name="years" value="1"/> Buy 1 Year</label>
+                  <label><input type="radio" name="years" value="2" checked/> Buy 2 Years</label>
+                  <label><input type="radio" name="years" value="3"/> Buy 3 Years</label>
+                  <label><input type="radio" name="years" value="4"/> Buy 4 Years</label>
+                  <label><input type="radio" name="years" value="5"/> Buy 5 Years</label>
+                  <label><input type="radio" name="years" value="6"/> Buy 6 Years</label>
+                  <label><input type="radio" name="years" value="7"/> Buy 7 Years</label>
+                  <label><input type="radio" name="years" value="8"/> Buy 8 Years</label>
+                  <label><input type="radio" name="years" value="9"/> Buy 9 Years</label>
+                  <label><input type="radio" name="years" value="10"/> Buy 10 Years</label>
                 </div>
-                <div style={{display:"flex",flexDirection:"column",gap:"1rem"}}>
-                  {subs.map(sub=><SubscriptionPanel key={sub.id} sub={sub} onHeroSave={handleHeroSave} />)}
+                <div class="autopay-row">
+                  <a href="#">Auto-Pay may be disabled at any time on the preference tab</a>
+                  <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.875rem;">Auto-Pay <input type="checkbox" checked/></label>
                 </div>
-                <button style={{width:"100%",padding:"0.75rem",border:"2px dashed #93c5fd",color:"#2563eb",fontSize:"0.875rem",fontWeight:500,cursor:"pointer",background:"#fff"}}>
-                  + Add Another Flag Location
-                </button>
               </div>
-            )}
-
-            {activeTab === "billing" && <CartPaymentTab />}
-            {activeTab === "history" && <PaymentHistoryTab />}
-
-            {activeTab === "prefs" && (
-              <div style={{background:"#fff",padding:"3rem",border:"1px solid #e5e7eb",textAlign:"center",color:"#9ca3af",boxShadow:"0 1px 3px rgba(0,0,0,0.1)"}}>
-                <p style={{fontSize:"2.5rem",marginBottom:"0.75rem"}}>🚧</p>
-                <p style={{fontWeight:600,color:"#4b5563"}}>Preferences tab content</p>
-                <p style={{fontSize:"0.875rem",marginTop:"0.25rem"}}>This section would display here.</p>
+              <div class="first-delivery">
+                <span>First Delivery:</span>
+                <span>Veterans Day 2026</span>
               </div>
-            )}
+            </div>
+          </div>
+
+          <!-- Add Another Product -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div style="font-weight:700;color:#1f2937;font-size:0.875rem;">Add Another Product</div>
+                <div style="font-size:0.75rem;color:#6b7280;margin-top:0.125rem;">Check out our other products</div>
+              </div>
+            </div>
+            <div class="product-tiles">
+              <div class="product-tile">
+                <img src="https://i.ibb.co/39KHyB1c/FHlogo.png" alt="Field of Heroes"/>
+                <h4>Field of Heroes</h4>
+                <p>Honor a veteran with a flag displayed at our Field of Heroes event.</p>
+                <button class="btn-addcart">Add to Cart</button>
+              </div>
+              <div class="product-tile">
+                <img src="https://i.ibb.co/sJRfyKZx/Donation-Image.jpg" alt="Military Flags"/>
+                <h4>Military Flags</h4>
+                <p>Proudly display a military flag at your home or business address.</p>
+                <button class="btn-addcart">Add to Cart</button>
+              </div>
+              <div class="product-tile">
+                <img src="https://i.ibb.co/3mpmJVZP/USA-Flag.jpg" alt="Home Flags"/>
+                <h4>Home Flags</h4>
+                <p>Have a 3'x5' flag placed in your yard for 6 holidays per year.</p>
+                <button class="btn-addcart">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Donation -->
+          <div class="card">
+            <div class="card-body donation-section">
+              <div style="display:flex;align-items:center;gap:0.5rem;">
+                <span style="font-size:1.25rem;">✨</span>
+                <strong style="color:#1d4ed8;font-size:0.875rem;">Please Consider An Additional Donation To:</strong>
+              </div>
+              <div class="donation-product">
+                <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=120&q=80" alt="donation"/>
+                <div>
+                  <p style="font-weight:600;font-size:0.875rem;color:#1f2937;">Test Donation Label for Testing VB</p>
+                  <p style="font-size:0.75rem;color:#6b7280;margin-top:0.25rem;">This is the test additional donation description... <a href="#" style="color:#3b82f6;">read more</a></p>
+                </div>
+              </div>
+              <div class="donation-opts">
+                <label><input type="radio" name="donation" value="20"/><span>$20</span></label>
+                <label><input type="radio" name="donation" value="40"/><span>$40</span></label>
+                <label><input type="radio" name="donation" value="60"/><span>$60</span></label>
+                <label><input type="radio" name="donation" value="80"/><span>$80</span></label>
+                <label><input type="radio" name="donation" value="100"/><span>$100</span></label>
+                <label><input type="radio" name="donation" value="other"/><span>Other</span></label>
+                <label><input type="radio" name="donation" value="none" checked/><span>Not Now</span></label>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- end cart-left -->
+
+        <!-- RIGHT COLUMN -->
+        <div class="cart-right">
+          <div class="summary-box">
+            <div class="summary-header">Shopping Cart Summary</div>
+            <div class="summary-body">
+              <p style="font-weight:600;font-size:0.875rem;color:#1f2937;margin-bottom:0.5rem;">Home Flag Delivery Membership</p>
+              <div class="summary-row"><span>Subscription: 11/11/2025 – 11/10/2026</span><span>$50.00</span></div>
+              <div class="summary-row discount"><span>Multi-Year Discount (min. 2 years)</span><span>−$10.00</span></div>
+              <div class="summary-row"><span>Subscription: 11/11/2026 – 11/10/2027</span><span>$50.00</span></div>
+              <div class="summary-row discount"><span>Multi-Year Discount (min. 2 years)</span><span>−$10.00</span></div>
+              <hr class="summary-divider"/>
+              <div class="summary-row"><span>Total Flag Subscriptions</span><span>$100.00</span></div>
+              <div class="summary-row discount"><span>Total Multi-Year Discount</span><span>−$20.00</span></div>
+              <div class="summary-row"><span>Additional Donation</span><span>$0.00</span></div>
+              <hr class="summary-divider"/>
+              <div class="summary-row subtotal"><span>Subtotal</span><span>$78.00</span></div>
+              <div class="summary-row total"><span>Total</span><span>$78.00</span></div>
+              <p style="font-size:0.7rem;color:#9ca3af;margin-top:0.5rem;">Volume Discount applied automatically based on flag count per subscription.</p>
+            </div>
+          </div>
+
+          <div class="payment-box">
+            <div class="payment-header">Payment Method</div>
+            <div class="payment-body">
+              <div class="radio-row">
+                <label><input type="radio" name="paymethod" value="cc" checked/> 💳 Credit Card</label>
+                <label><input type="radio" name="paymethod" value="echeck"/> 🏦 eCheck</label>
+              </div>
+              <div class="form-group">
+                <label>Cardholder's Name</label>
+                <input type="text" placeholder="e.g. John Smith"/>
+              </div>
+              <div class="form-group">
+                <label>Card Number</label>
+                <input type="text" placeholder="0000000000000000"/>
+              </div>
+              <div class="form-group">
+                <label>Billing Zipcode</label>
+                <input type="text" placeholder="00000"/>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>MM</label>
+                  <select>
+                    <option>01</option><option>02</option><option>03</option><option>04</option>
+                    <option>05</option><option>06</option><option>07</option><option>08</option>
+                    <option>09</option><option>10</option><option>11</option><option>12</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>YYYY</label>
+                  <select>
+                    <option>2025</option><option>2026</option><option>2027</option><option>2028</option>
+                    <option>2029</option><option>2030</option><option>2031</option><option>2032</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Card CVV</label>
+                  <input type="text" placeholder="000" maxlength="4"/>
+                </div>
+              </div>
+              <p style="font-size:0.75rem;color:#9ca3af;">After submitting your payment you will receive an e-mail receipt to the address registered above.</p>
+              <div class="sms-row">
+                <input type="checkbox" checked/>
+                <span><strong>Don't miss delivery notifications</strong> – Opt-In to SMS Text Messaging. Reply <strong>HELP</strong> for help, <strong>STOP</strong> to cancel.</span>
+              </div>
+              <p class="order-warning">Click "Place my Order" only once</p>
+              <button class="btn-order">Place my Order</button>
+            </div>
           </div>
         </div>
-      );
+      </div>
+    </div>
+
+    <!-- PAYMENT HISTORY TAB -->
+    <div id="tab-history" class="tab-panel">
+      <div class="grid-3" style="margin-bottom:1rem;">
+        <div class="stat-card"><div class="icon">💰</div><div class="value" style="color:#059669">$143.00</div><div class="label">Total Paid</div></div>
+        <div class="stat-card"><div class="icon">📄</div><div class="value" style="color:#2563eb">3</div><div class="label">Transactions</div></div>
+        <div class="stat-card"><div class="icon">📅</div><div class="value" style="color:#1f2937;font-size:1.1rem;">3-17-2026</div><div class="label">Last Payment</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h2>Payment Details</h2>
+          <button class="btn-flag-mgr">📬 Reach out to Flag Manager</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="history-table">
+            <thead>
+              <tr><th>Date</th><th>Description</th><th>Type</th><th style="text-align:right;">Amount</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div>3-17-2026</div><span class="badge-paid">✓ Paid</span></td>
+                <td>Field of Heroes – Renewal</td>
+                <td><span class="type-badge">CASH</span></td>
+                <td style="text-align:right;font-weight:700;">$40.00 <button style="background:none;border:none;cursor:pointer;color:#9ca3af;">📄</button></td>
+              </tr>
+              <tr>
+                <td><div>3-17-2026</div><span class="badge-paid">✓ Paid</span></td>
+                <td>Processing Fee</td>
+                <td><span class="type-badge">CASH</span></td>
+                <td style="text-align:right;font-weight:700;">$3.00 <button style="background:none;border:none;cursor:pointer;color:#9ca3af;">📄</button></td>
+              </tr>
+              <tr>
+                <td><div>2-17-2026</div><span class="badge-paid">✓ Paid</span></td>
+                <td>Military Flags – Annual</td>
+                <td><span class="type-badge">CASH</span></td>
+                <td style="text-align:right;font-weight:700;">$100.00 <button style="background:none;border:none;cursor:pointer;color:#9ca3af;">📄</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <div><div class="total-label">Total</div><div class="total-val">$143.00</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PREFERENCES TAB -->
+    <div id="tab-prefs" class="tab-panel">
+      <div class="card" style="padding:3rem;text-align:center;color:#9ca3af;">
+        <p style="font-size:2.5rem;margin-bottom:0.75rem;">🚧</p>
+        <p style="font-weight:600;color:#4b5563;">Preferences tab content</p>
+        <p style="font-size:0.875rem;margin-top:0.25rem;">This section would display here.</p>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+
+  <script>
+    // Tab switching
+    document.querySelectorAll('.tab-link').forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelectorAll('.tab-link').forEach(function(l) { l.classList.remove('active'); });
+        document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+        this.classList.add('active');
+        document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Toggle subscription hero panel
+    function toggleSub(id) {
+      var el = document.getElementById(id);
+      el.classList.toggle('open');
     }
 
-    ReactDOM.render(<App />, document.getElementById("root"));
+    // Flag count +/-
+    function changeFlag(id, delta) {
+      var el = document.getElementById(id);
+      var val = parseInt(el.textContent) + delta;
+      if (val < 1) val = 1;
+      el.textContent = val;
+    }
   </script>
 </body>
 </html>
