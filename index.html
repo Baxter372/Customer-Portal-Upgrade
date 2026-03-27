@@ -6,6 +6,7 @@
   <title>Customer Portal – Friends of Fairview</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+    html { font-size: 18px; }
     body { background: #f3f4f6; }
 
     /* NAV */
@@ -310,7 +311,7 @@
                   <div class="hero-flag">Flag #1</div>
                   <div class="hero-name">Sgt. James Walker</div>
                 </div>
-                <button class="hero-edit-btn">✏️ Edit</button>
+                <button class="hero-edit-btn" onclick="openModal(this)">✏️ Edit</button>
               </div>
               <div class="hero-branch">Army</div>
               <div class="hero-story">Served two tours in Afghanistan.</div>
@@ -322,19 +323,19 @@
                   <div class="hero-flag">Flag #2</div>
                   <div class="hero-name">Lt. Maria Chen</div>
                 </div>
-                <button class="hero-edit-btn">✏️ Edit</button>
+                <button class="hero-edit-btn" onclick="openModal(this)">✏️ Edit</button>
               </div>
               <div class="hero-branch">Navy</div>
               <div class="hero-story">Decorated naval officer.</div>
             </div>
-            <div class="hero-card empty"><div class="plus">+</div><div>Flag #3</div><div>Click to add hero info</div></div>
-            <div class="hero-card empty"><div class="plus">+</div><div>Flag #4</div><div>Click to add hero info</div></div>
-            <div class="hero-card empty"><div class="plus">+</div><div>Flag #5</div><div>Click to add hero info</div></div>
-            <div class="hero-card empty"><div class="plus">+</div><div>Flag #6</div><div>Click to add hero info</div></div>
-            <div class="hero-card empty"><div class="plus">+</div><div>Flag #7</div><div>Click to add hero info</div></div>
-            <div class="hero-card empty"><div class="plus">+</div><div>Flag #8</div><div>Click to add hero info</div></div>
-            <div class="hero-card empty"><div class="plus">+</div><div>Flag #9</div><div>Click to add hero info</div></div>
-            <div class="hero-card empty"><div class="plus">+</div><div>Flag #10</div><div>Click to add hero info</div></div>
+            <div class="hero-card empty" onclick="openEmptyModal(this)"><div class="plus">+</div><div>Flag #3</div><div>Click to add hero info</div></div>
+            <div class="hero-card empty" onclick="openEmptyModal(this)"><div class="plus">+</div><div>Flag #4</div><div>Click to add hero info</div></div>
+            <div class="hero-card empty" onclick="openEmptyModal(this)"><div class="plus">+</div><div>Flag #5</div><div>Click to add hero info</div></div>
+            <div class="hero-card empty" onclick="openEmptyModal(this)"><div class="plus">+</div><div>Flag #6</div><div>Click to add hero info</div></div>
+            <div class="hero-card empty" onclick="openEmptyModal(this)"><div class="plus">+</div><div>Flag #7</div><div>Click to add hero info</div></div>
+            <div class="hero-card empty" onclick="openEmptyModal(this)"><div class="plus">+</div><div>Flag #8</div><div>Click to add hero info</div></div>
+            <div class="hero-card empty" onclick="openEmptyModal(this)"><div class="plus">+</div><div>Flag #9</div><div>Click to add hero info</div></div>
+            <div class="hero-card empty" onclick="openEmptyModal(this)"><div class="plus">+</div><div>Flag #10</div><div>Click to add hero info</div></div>
           </div>
         </div>
       </div>
@@ -371,9 +372,7 @@
                   <div class="hero-flag">Flag #1</div>
                   <div class="hero-name">Col. Robert Davis</div>
                 </div>
-                <button class="hero-edit-btn">✏️ Edit</button>
-              </div>
-              <div class="hero-branch">Air Force</div>
+                <button class="hero-edit-btn" onclick="openModal(this)">✏️ Edit</button>
               <div class="hero-story">30 years of service.</div>
             </div>
           </div>
@@ -402,7 +401,34 @@
         </div>
       </div>
 
-      <button class="dashed-btn">+ Add Another Flag Location</button>
+      <div class="card" style="margin-top:0.75rem;">
+        <div class="card-header">
+          <div>
+            <div style="font-weight:700;color:#1f2937;font-size:0.875rem;">Add Another Product</div>
+            <div style="font-size:0.75rem;color:#6b7280;margin-top:0.125rem;">Check out our other products</div>
+          </div>
+        </div>
+        <div class="product-tiles">
+          <div class="product-tile">
+            <img src="https://i.ibb.co/39KHyB1c/FHlogo.png" alt="Field of Heroes"/>
+            <h4>Field of Heroes</h4>
+            <p>Honor a veteran with a flag displayed at our Field of Heroes event.</p>
+            <button class="btn-addcart">Add to Cart</button>
+          </div>
+          <div class="product-tile">
+            <img src="https://i.ibb.co/sJRfyKZx/Donation-Image.jpg" alt="Military Flags"/>
+            <h4>Military Flags</h4>
+            <p>Proudly display a military flag at your home or business address.</p>
+            <button class="btn-addcart">Add to Cart</button>
+          </div>
+          <div class="product-tile">
+            <img src="https://i.ibb.co/3mpmJVZP/USA-Flag.jpg" alt="Home Flags"/>
+            <h4>Home Flags</h4>
+            <p>Have a 3'x5' flag placed in your yard for 6 holidays per year.</p>
+            <button class="btn-addcart">Add to Cart</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- CART & PAYMENT TAB -->
@@ -683,6 +709,48 @@
 
   </div><!-- end content -->
 
+  <!-- HERO EDIT MODAL -->
+  <div id="hero-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:#fff;width:100%;max-width:480px;margin:1rem;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+      <div style="background:#1d4ed8;padding:1rem 1.25rem;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-weight:700;color:#fff;font-size:1rem;" id="modal-title">Edit Hero – Flag #1</span>
+        <button onclick="closeModal()" style="background:none;border:none;color:#fff;font-size:1.25rem;cursor:pointer;line-height:1;">✕</button>
+      </div>
+      <div style="padding:1.25rem;display:flex;flex-direction:column;gap:1rem;">
+        <div style="display:flex;align-items:center;gap:1rem;">
+          <div id="modal-avatar" style="width:3.5rem;height:3.5rem;background:linear-gradient(135deg,#2563eb,#4338ca);color:#fff;font-weight:700;font-size:1.1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">?</div>
+          <div style="flex:1;">
+            <label style="font-size:0.8rem;color:#6b7280;font-weight:500;">Hero Full Name</label>
+            <input id="modal-name" type="text" placeholder="e.g. Sgt. James Walker"
+              style="width:100%;border:1px solid #d1d5db;padding:0.5rem 0.75rem;font-size:1rem;margin-top:0.25rem;"
+              oninput="updateModalAvatar()"/>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:0.8rem;color:#6b7280;font-weight:500;">Military Branch</label>
+          <select id="modal-branch" style="width:100%;border:1px solid #d1d5db;padding:0.5rem 0.75rem;font-size:1rem;margin-top:0.25rem;">
+            <option value="">Select Military Branch</option>
+            <option>Army</option>
+            <option>Navy</option>
+            <option>Air Force</option>
+            <option>Marines</option>
+            <option>Coast Guard</option>
+            <option>Space Force</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.8rem;color:#6b7280;font-weight:500;">Hero's Story</label>
+          <textarea id="modal-story" rows="4" placeholder="Share this hero's story..."
+            style="width:100%;border:1px solid #d1d5db;padding:0.5rem 0.75rem;font-size:1rem;margin-top:0.25rem;resize:vertical;"></textarea>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:0.75rem;padding-top:0.5rem;border-top:1px solid #f3f4f6;">
+          <button onclick="closeModal()" style="padding:0.6rem 1.25rem;border:1px solid #d1d5db;background:#fff;cursor:pointer;font-size:0.95rem;">Cancel</button>
+          <button onclick="saveHero()" style="padding:0.6rem 1.25rem;background:#1d4ed8;color:#fff;border:none;cursor:pointer;font-weight:700;font-size:0.95rem;">Save Hero</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Tab switching
     document.querySelectorAll('.tab-link').forEach(function(link) {
@@ -708,6 +776,85 @@
       if (val < 1) val = 1;
       el.textContent = val;
     }
+
+    // Modal
+    var currentCard = null;
+
+    function openModal(btn) {
+      currentCard = btn.closest('.hero-card');
+      var flagLabel = currentCard.querySelector('.hero-flag') ? currentCard.querySelector('.hero-flag').textContent : '';
+      var name = currentCard.querySelector('.hero-name') ? currentCard.querySelector('.hero-name').textContent : '';
+      var branch = currentCard.querySelector('.hero-branch') ? currentCard.querySelector('.hero-branch').textContent : '';
+      var story = currentCard.querySelector('.hero-story') ? currentCard.querySelector('.hero-story').textContent : '';
+
+      document.getElementById('modal-title').textContent = 'Edit Hero – ' + flagLabel;
+      document.getElementById('modal-name').value = name;
+      document.getElementById('modal-branch').value = branch;
+      document.getElementById('modal-story').value = story;
+      updateModalAvatar();
+
+      var modal = document.getElementById('hero-modal');
+      modal.style.display = 'flex';
+    }
+
+    function openEmptyModal(btn) {
+      currentCard = btn.closest('.hero-card');
+      var lines = currentCard.querySelectorAll('div');
+      var flagText = lines[1] ? lines[1].textContent : '';
+      document.getElementById('modal-title').textContent = 'Add Hero – ' + flagText;
+      document.getElementById('modal-name').value = '';
+      document.getElementById('modal-branch').value = '';
+      document.getElementById('modal-story').value = '';
+      document.getElementById('modal-avatar').textContent = '?';
+      document.getElementById('hero-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('hero-modal').style.display = 'none';
+      currentCard = null;
+    }
+
+    function updateModalAvatar() {
+      var name = document.getElementById('modal-name').value.trim();
+      var parts = name.split(' ').filter(Boolean);
+      var initials = parts.length >= 2 ? parts[0][0] + parts[parts.length-1][0] : parts.length === 1 ? parts[0][0] : '?';
+      document.getElementById('modal-avatar').textContent = initials.toUpperCase();
+    }
+
+    function saveHero() {
+      if (!currentCard) return;
+      var name = document.getElementById('modal-name').value.trim();
+      var branch = document.getElementById('modal-branch').value;
+      var story = document.getElementById('modal-story').value.trim();
+
+      if (!name) { alert('Please enter a hero name.'); return; }
+
+      var parts = name.split(' ').filter(Boolean);
+      var initials = parts.length >= 2 ? parts[0][0] + parts[parts.length-1][0] : parts[0][0];
+
+      // Rebuild the card as a filled hero card
+      var flagNum = currentCard.querySelector('.hero-flag') ? currentCard.querySelector('.hero-flag').textContent : currentCard.querySelectorAll('div')[1] ? currentCard.querySelectorAll('div')[1].textContent : 'Flag #?';
+
+      currentCard.classList.remove('empty');
+      currentCard.innerHTML =
+        '<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.4rem;">' +
+          '<div class="hero-avatar">' + initials.toUpperCase() + '</div>' +
+          '<div style="min-width:0;">' +
+            '<div class="hero-flag">' + flagNum + '</div>' +
+            '<div class="hero-name">' + name + '</div>' +
+          '</div>' +
+          '<button class="hero-edit-btn" onclick="openModal(this)">✏️ Edit</button>' +
+        '</div>' +
+        (branch ? '<div class="hero-branch">' + branch + '</div>' : '') +
+        (story ? '<div class="hero-story">' + story + '</div>' : '');
+
+      closeModal();
+    }
+
+    // Close modal on backdrop click
+    document.getElementById('hero-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
   </script>
 </body>
 </html>
