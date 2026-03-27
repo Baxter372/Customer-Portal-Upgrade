@@ -197,8 +197,24 @@
       <button onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
-      <div style="display:flex;align-items:center;gap:1rem;">
-        <div class="modal-avatar" id="modal-avatar">?</div>
+      <div style="display:flex;align-items:flex-start;gap:1rem;">
+        <!-- Photo upload area -->
+        <div style="flex-shrink:0;text-align:center;">
+          <div id="modal-photo-wrap" onclick="document.getElementById('modal-photo-input').click()"
+            style="width:5rem;height:5rem;cursor:pointer;overflow:hidden;border:2px dashed #93c5fd;display:flex;align-items:center;justify-content:center;background:#eff6ff;position:relative;"
+            title="Click to change photo">
+            <img id="modal-photo-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:none;"/>
+            <div id="modal-photo-placeholder" style="display:flex;flex-direction:column;align-items:center;gap:0.25rem;color:#93c5fd;">
+              <span style="font-size:1.5rem;">📷</span>
+              <span style="font-size:0.6rem;font-weight:600;">Add Photo</span>
+            </div>
+            <div id="modal-photo-overlay" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.45);align-items:center;justify-content:center;color:#fff;font-size:0.65rem;font-weight:600;flex-direction:column;gap:0.2rem;">
+              <span style="font-size:1.1rem;">✏️</span>Change
+            </div>
+          </div>
+          <input type="file" id="modal-photo-input" accept="image/*" style="display:none;" onchange="handlePhotoUpload(event)"/>
+          <p style="font-size:0.6rem;color:#9ca3af;margin-top:0.3rem;">Click to change</p>
+        </div>
         <div style="flex:1;">
           <label class="modal-label">Hero Full Name</label>
           <input class="modal-input" id="modal-name" type="text" placeholder="e.g. Sgt. James Walker" oninput="updateModalAvatar()"/>
@@ -324,9 +340,9 @@
         <div class="heroes-header"><span>Honored Heroes</span><small>20% complete</small></div>
         <div class="progress-bar"><div class="progress-fill" style="width:20%"></div></div>
         <div class="hero-grid">
-          <div class="hero-card">
+          <div class="hero-card" data-photo="https://i.ibb.co/xSCZhMV9/Navy-Man.jpg">
             <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.4rem;">
-              <div class="hero-avatar">JW</div>
+              <img src="https://i.ibb.co/xSCZhMV9/Navy-Man.jpg" alt="Sgt. James Walker" style="width:2.25rem;height:2.25rem;object-fit:cover;flex-shrink:0;"/>
               <div style="min-width:0;flex:1;">
                 <div class="hero-flag-lbl">Flag #1</div>
                 <div class="hero-name">Sgt. James Walker</div>
@@ -887,6 +903,39 @@
   // Hero modal
   var currentCard = null;
 
+  function setModalPhoto(src) {
+    var img = document.getElementById('modal-photo-img');
+    var placeholder = document.getElementById('modal-photo-placeholder');
+    var overlay = document.getElementById('modal-photo-overlay');
+    if (src) {
+      img.src = src;
+      img.style.display = 'block';
+      placeholder.style.display = 'none';
+      overlay.style.display = 'flex';
+    } else {
+      img.src = '';
+      img.style.display = 'none';
+      placeholder.style.display = 'flex';
+      overlay.style.display = 'none';
+    }
+  }
+
+  function handlePhotoUpload(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) { setModalPhoto(e.target.result); };
+    reader.readAsDataURL(file);
+  }
+
+  // hover effect on photo wrap
+  document.addEventListener('DOMContentLoaded', function() {
+    var wrap = document.getElementById('modal-photo-wrap');
+    var overlay = document.getElementById('modal-photo-overlay');
+    wrap.addEventListener('mouseenter', function() { if (document.getElementById('modal-photo-img').style.display !== 'none') overlay.style.display = 'flex'; });
+    wrap.addEventListener('mouseleave', function() { if (document.getElementById('modal-photo-img').style.display !== 'none') overlay.style.display = 'flex'; });
+  });
+
   function openModal(btn) {
     currentCard = btn.closest('.hero-card');
     var flagLbl = currentCard.querySelector('.hero-flag-lbl') ? currentCard.querySelector('.hero-flag-lbl').textContent : '';
@@ -894,6 +943,9 @@
     document.getElementById('modal-name').value = currentCard.querySelector('.hero-name') ? currentCard.querySelector('.hero-name').textContent : '';
     document.getElementById('modal-branch').value = currentCard.querySelector('.hero-branch') ? currentCard.querySelector('.hero-branch').textContent : '';
     document.getElementById('modal-story').value = currentCard.querySelector('.hero-story') ? currentCard.querySelector('.hero-story').textContent : '';
+    document.getElementById('modal-photo-input').value = '';
+    var photo = currentCard.dataset.photo || (currentCard.querySelector('img') ? currentCard.querySelector('img').src : '');
+    setModalPhoto(photo || '');
     updateModalAvatar();
     document.getElementById('hero-modal').classList.add('open');
   }
@@ -906,7 +958,8 @@
     document.getElementById('modal-name').value = '';
     document.getElementById('modal-branch').value = '';
     document.getElementById('modal-story').value = '';
-    document.getElementById('modal-avatar').textContent = '?';
+    document.getElementById('modal-photo-input').value = '';
+    setModalPhoto('');
     document.getElementById('hero-modal').classList.add('open');
   }
 
@@ -932,11 +985,15 @@
     var initials = (parts.length >= 2 ? parts[0][0] + parts[parts.length-1][0] : parts[0][0]).toUpperCase();
     var flagLbl = currentCard.querySelector('.hero-flag-lbl') ? currentCard.querySelector('.hero-flag-lbl').textContent
                 : currentCard.querySelectorAll('div')[1] ? currentCard.querySelectorAll('div')[1].textContent : '';
+    var photoSrc = document.getElementById('modal-photo-img').style.display !== 'none' ? document.getElementById('modal-photo-img').src : '';
     currentCard.classList.remove('empty');
     currentCard.removeAttribute('onclick');
+    currentCard.dataset.photo = photoSrc;
     currentCard.innerHTML =
       '<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.4rem;">' +
-        '<div class="hero-avatar">' + initials + '</div>' +
+        (photoSrc
+          ? '<img src="' + photoSrc + '" alt="' + name + '" style="width:2.25rem;height:2.25rem;object-fit:cover;flex-shrink:0;"/>'
+          : '<div class="hero-avatar">' + initials + '</div>') +
         '<div style="min-width:0;flex:1;"><div class="hero-flag-lbl">' + flagLbl + '</div><div class="hero-name">' + name + '</div></div>' +
         '<button class="hero-edit-btn" onclick="openModal(this)">✏️ Edit</button>' +
       '</div>' +
